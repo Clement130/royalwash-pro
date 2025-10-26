@@ -114,8 +114,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Services Section - ESPACEMENT AUGMENTÉ */}
-      <section id="services" className="py-32 bg-gray-50">
+      {/* Services Section - ESPACEMENT FORCÉ */}
+      <section id="services" className="py-32 my-24 min-h-screen bg-gray-50" style={{ marginTop: '150px', marginBottom: '150px', paddingTop: '150px', paddingBottom: '150px' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Nos Services</h2>
@@ -326,8 +326,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing Section - ESPACEMENT AUGMENTÉ */}
-      <section id="tarifs" className="py-32 bg-white">
+      {/* Pricing Section - ESPACEMENT FORCÉ */}
+      <section id="tarifs" className="py-32 my-24 bg-white" style={{ marginTop: '150px', marginBottom: '150px', paddingTop: '150px', paddingBottom: '150px' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Nos Tarifs</h2>
@@ -499,8 +499,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contact Section - ESPACEMENT AUGMENTÉ */}
-      <section id="contact" className="py-32 bg-gray-50">
+      {/* Contact Section - ESPACEMENT FORCÉ */}
+      <section id="contact" className="py-32 my-24 bg-gray-50" style={{ marginTop: '150px', marginBottom: '150px', paddingTop: '150px', paddingBottom: '150px' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Contactez-nous</h2>
