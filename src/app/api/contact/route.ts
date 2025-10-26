@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
+import { Resend } from 'resend';
+import { clientConfirmationTemplate, adminNotificationTemplate } from '@/lib/email-templates';
 
 // Interface pour typer les données du formulaire
 interface ContactFormData {
@@ -40,28 +42,69 @@ async function saveLead(data: ContactFormData) {
   return leads.length; // Retourne le nombre total de leads
 }
 
-// Configuration pour l'envoi d'email via service gratuit
-// Note: Pour production, configurez les variables d'environnement
+// Initialiser le client Resend avec la clé API depuis les variables d'environnement
+// Resend permet d'envoyer 3000 emails gratuits par mois, ce qui est largement suffisant
+// pour démarrer un business d'automatisation
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Configuration pour l'envoi automatique d'emails via Resend
+// Cette fonction envoie deux emails en parallèle:
+// 1. Email de confirmation au client (le rassure immédiatement)
+// 2. Email de notification à l'admin (permet une réaction rapide)
 async function sendEmailNotification(data: ContactFormData) {
-  // Pour l'instant, on log simplement les données
-  // En production, vous pouvez utiliser des services comme:
-  // - Resend (gratuit jusqu'à 3000 emails/mois)
-  // - SendGrid
-  // - Mailgun (gratuit jusqu'à 5000 emails/mois)
-  // - EmailJS (côté client)
-  
-  console.log('=== NOUVEAU LEAD REÇU ===');
-  console.log('Nom:', data.name);
-  console.log('Email:', data.email);
-  console.log('Téléphone:', data.phone);
-  console.log('Service:', data.service);
-  console.log('Message:', data.message);
-  console.log('ID:', data.id);
-  console.log('Timestamp:', data.timestamp);
-  console.log('========================');
-  
-  // TODO: Implémenter l'envoi d'email réel ici
-  return true;
+  try {
+    // Vérifier que les variables d'environnement sont configurées
+    if (!process.env.RESEND_API_KEY || !process.env.RESEND_FROM_EMAIL || !process.env.RESEND_TO_EMAIL) {
+      console.error('⚠️ Variables d\'environnement Resend manquantes. Emails non envoyés.');
+      console.error('Configurez: RESEND_API_KEY, RESEND_FROM_EMAIL, RESEND_TO_EMAIL dans .env.local');
+      return false;
+    }
+
+    // Email 1: Confirmation au client
+    // Objectif: Rassurer immédiatement le client que sa demande est prise en compte
+    // Cela réduit l'anxiété et augmente la perception de professionnalisme
+    const clientEmail = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL!,
+      to: data.email,
+      subject: '✅ Confirmation de votre demande - Royal Wash Pro',
+      html: clientConfirmationTemplate({
+        name: data.name,
+        service: data.service,
+        message: data.message,
+        leadId: data.id
+      })
+    });
+
+    // Email 2: Notification à l'administrateur (vous)
+    // Objectif: Vous alerter instantanément pour pouvoir réagir dans les 24h
+    // Le design "terminal" permet de démarquer cette notification des emails standards
+    const adminEmail = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL!,
+      to: process.env.RESEND_TO_EMAIL!,
+      subject: `🚗 Nouveau lead: ${data.name} - ${data.service.toUpperCase()}`,
+      html: adminNotificationTemplate({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        service: data.service,
+        message: data.message,
+        timestamp: data.timestamp
+      })
+    });
+
+    console.log('✅ Emails envoyés avec succès');
+    console.log('- Email client ID:', clientEmail.data?.id);
+    console.log('- Email admin ID:', adminEmail.data?.id);
+    
+    return true;
+    
+  } catch (error) {
+    // En cas d'erreur d'envoi, on log l'erreur mais on ne bloque pas
+    // la création du lead. L'important est de capturer la demande du client.
+    console.error('❌ Erreur lors de l\'envoi des emails:', error);
+    console.error('Le lead a quand même été sauvegardé dans leads.json');
+    return false;
+  }
 }
 
 export async function POST(request: NextRequest) {
