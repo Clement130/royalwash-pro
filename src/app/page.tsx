@@ -17,6 +17,20 @@ export default function Home() {
     message: string;
   }>({ type: null, message: '' });
 
+  // Fonction pour pré-remplir le service et scroller vers le formulaire
+  const handleSelectService = (service: 'essentielle' | 'premium' | 'vip') => {
+    // Pré-remplir le champ service
+    setFormData({ ...formData, service });
+
+    // Smooth scroll vers le formulaire
+    setTimeout(() => {
+      const contactSection = document.getElementById('contact');
+      if (contactSection) {
+        contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -56,7 +70,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen scroll-smooth">
       {/* Hero Section */}
       <section id="accueil" className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-700 to-blue-600 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
@@ -100,8 +114,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Services Section */}
-      <section id="services" className="py-20 bg-gray-50">
+      {/* Services Section - ESPACEMENT AUGMENTÉ */}
+      <section id="services" className="py-32 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Nos Services</h2>
@@ -312,8 +326,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="tarifs" className="py-20 bg-white">
+      {/* Pricing Section - ESPACEMENT AUGMENTÉ */}
+      <section id="tarifs" className="py-32 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Nos Tarifs</h2>
@@ -358,12 +372,13 @@ export default function Home() {
                   Vitres extérieures
                 </li>
               </ul>
-              <a
-                href="#contact"
-                className="block w-full bg-gray-900 text-white text-center px-6 py-3 rounded-full font-semibold hover:bg-gray-800 transition-colors"
+              {/* BOUTON MODIFIÉ - avec onClick et animation */}
+              <button
+                onClick={() => handleSelectService('essentielle')}
+                className="block w-full bg-gray-900 text-white text-center px-6 py-3 rounded-full font-semibold hover:bg-gray-800 transition-all hover:scale-105 hover:shadow-lg"
               >
                 Choisir
-              </a>
+              </button>
             </div>
 
             {/* Premium Plan */}
@@ -416,12 +431,13 @@ export default function Home() {
                   Lustrage carrosserie
                 </li>
               </ul>
-              <a
-                href="#contact"
-                className="block w-full bg-white text-blue-600 text-center px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+              {/* BOUTON MODIFIÉ - avec onClick et animation */}
+              <button
+                onClick={() => handleSelectService('premium')}
+                className="block w-full bg-white text-blue-600 text-center px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all hover:scale-105 hover:shadow-lg"
               >
                 Choisir
-              </a>
+              </button>
             </div>
 
             {/* VIP Plan */}
@@ -471,19 +487,20 @@ export default function Home() {
                   Traitement cuir
                 </li>
               </ul>
-              <a
-                href="#contact"
-                className="block w-full bg-gray-900 text-white text-center px-6 py-3 rounded-full font-semibold hover:bg-gray-800 transition-colors"
+              {/* BOUTON MODIFIÉ - avec onClick et animation */}
+              <button
+                onClick={() => handleSelectService('vip')}
+                className="block w-full bg-gray-900 text-white text-center px-6 py-3 rounded-full font-semibold hover:bg-gray-800 transition-all hover:scale-105 hover:shadow-lg"
               >
                 Choisir
-              </a>
+              </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-20 bg-gray-50">
+      {/* Contact Section - ESPACEMENT AUGMENTÉ */}
+      <section id="contact" className="py-32 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Contactez-nous</h2>
@@ -507,6 +524,7 @@ export default function Home() {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition"
                     required
+                    aria-invalid={false}
                   />
                 </div>
 
@@ -521,6 +539,7 @@ export default function Home() {
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition"
                     required
+                    aria-invalid={false}
                   />
                 </div>
 
@@ -535,6 +554,7 @@ export default function Home() {
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition"
                     required
+                    aria-invalid={false}
                   />
                 </div>
 
@@ -548,6 +568,7 @@ export default function Home() {
                     onChange={(e) => setFormData({ ...formData, service: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition"
                     required
+                    aria-invalid={false}
                   >
                     <option value="">Sélectionnez un service</option>
                     <option value="essentielle">Formule Essentielle</option>
@@ -569,13 +590,14 @@ export default function Home() {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition resize-none"
                     placeholder="Parlez-nous de votre véhicule et de vos besoins..."
                     required
+                    aria-invalid={false}
                   />
                 </div>
 
                 {/* Message de succès ou d'erreur */}
                 {submitStatus.type && (
                   <div
-                    className={`p-4 rounded-lg ${
+                    className={`p-4 rounded-lg animate-fade-in-up ${
                       submitStatus.type === 'success'
                         ? 'bg-green-50 border-2 border-green-500 text-green-800'
                         : 'bg-red-50 border-2 border-red-500 text-red-800'
