@@ -11,10 +11,48 @@ export default function Home() {
     message: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Merci pour votre demande! Nous vous contacterons bientôt.');
-    setFormData({ name: '', email: '', phone: '', service: '', message: '' });
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: '' });
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setSubmitStatus({
+          type: 'success',
+          message: data.message
+        });
+        setFormData({ name: '', email: '', phone: '', service: '', message: '' });
+      } else {
+        setSubmitStatus({
+          type: 'error',
+          message: data.error || 'Une erreur est survenue. Veuillez réessayer.'
+        });
+      }
+    } catch (error) {
+      setSubmitStatus({
+        type: 'error',
+        message: 'Impossible de soumettre votre demande. Vérifiez votre connexion internet.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -536,10 +574,34 @@ export default function Home() {
 
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-800 text-white px-8 py-4 rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all"
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-800 text-white px-8 py-4 rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                  Envoyer la demande
+                  {isSubmitting ? 'Envoi en cours...' : 'Envoyer la demande'}
                 </button>
+
+                {submitStatus.type && (
+                  <div
+                    className={`mt-4 p-4 rounded-lg ${
+                      submitStatus.type === 'success'
+                        ? 'bg-green-50 border border-green-200 text-green-800'
+                        : 'bg-red-50 border border-red-200 text-red-800'
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      {submitStatus.type === 'success' ? (
+                        <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                      <p className="text-sm font-medium">{submitStatus.message}</p>
+                    </div>
+                  </div>
+                )}
               </form>
             </div>
 
